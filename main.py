@@ -5,17 +5,16 @@ from mutagen.mp3 import MP3
 
 def sanitize_name(name):
     """Sanitize folder names to avoid issues with invalid characters."""
-    return "".join(c for c in name if c.isalnum() or c in " .-_").strip()
+    return "".join(c for c in name if c.isalnum() or c in " .-_()").strip()
 
 def organize_mp3s():
     path_source_input = input("Please enter source path: ")
     path_destination_input = input("Please enter destination path: ")
-    # path_source = rf"{path_source_input}"
 
     for filename in os.listdir(path_source_input):
         if not filename.lower().endswith(".mp3"):
             continue
-
+        
         filepath = os.path.join(path_source_input, filename)
 
         try:
@@ -23,15 +22,12 @@ def organize_mp3s():
             artist = audio.get('artist', ['Unknown Artist'])[0]
             album = audio.get('album', ['Unknown Album'])[0]
 
-            # Sanitize folder names
             artist_folder = sanitize_name(artist)
             album_folder = sanitize_name(album)
 
-            # Create nested folder structure
             target_dir = os.path.join(path_destination_input, artist_folder, album_folder)
             os.makedirs(target_dir, exist_ok=True)
 
-            # Move the file
             target_path = os.path.join(target_dir, filename)
             print(f"Moving '{filename}' to '{target_path}'")
             shutil.move(filepath, target_path)
@@ -40,6 +36,8 @@ def organize_mp3s():
             print(f"Error processing '{filename}': {e}")
 
 if __name__ == "__main__":
-    # music_directory = "./your_mp3_directory"  # Change this to your actual directory
-    # organize_mp3s(music_directory)
     organize_mp3s()
+
+
+# TODO:
+# can make this into an all-in-one with spotdl. This would allow me to implement custom code to prevent duplicates in the nested folders
